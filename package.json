@@ -1,8 +1,10 @@
 {
   "name": "codebox_day1",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "dev": "node server.js",
+    "token": "node scripts/generateToken.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,5 +18,10 @@
     "url": "https://github.com/HaroldHuynh/codebox_day1/issues"
   },
   "homepage": "https://github.com/HaroldHuynh/codebox_day1#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "dotenv": "^18.0.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
+  }
 }
