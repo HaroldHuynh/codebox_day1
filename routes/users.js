@@ -9,6 +9,16 @@ const {
 
 const router = express.Router();
 
+router.post("/", async (req, res) => {
+  try {
+    const newUser = await createUser(req.body);
+    return res.status(201).json(newUser);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+/*
 router.post("/", (req, res) => {
   const { name, email, isActive, age, hobbies } = req.body;
 
@@ -26,10 +36,20 @@ router.post("/", (req, res) => {
 
   const newUser = createUser({ name, email, isActive, age, hobbies });
   return res.status(201).json(newUser);
-});
+}); */
 
+/*
 router.get("/", (req, res) => {
   res.status(200).json(getUsers());
+}); */
+
+router.get("/", async (req, res) => {
+  try {
+    const users = await getUsers();
+    return res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 });
 
 function createPropertyUpdateRoute(property, isValid) {
@@ -42,11 +62,7 @@ function createPropertyUpdateRoute(property, isValid) {
       });
     }
 
-    const updatedUser = updateUserProperty(
-      req.params.id,
-      property,
-      value
-    );
+    const updatedUser = updateUserProperty(req.params.id, property, value);
 
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
