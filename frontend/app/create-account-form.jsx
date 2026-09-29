@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import FormField from "./components/FormField";
 
 const initialForm = { firstName: "", lastName: "", email: "", password: "", confirmPassword: "" };
 
@@ -27,12 +28,12 @@ export default function CreateAccountForm() {
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="name-fields">
-            <div className="field-group"><label htmlFor="first-name">First name</label><input id="first-name" name="firstName" type="text" autoComplete="given-name" value={form.firstName} onChange={updateField} required /></div>
-            <div className="field-group"><label htmlFor="last-name">Last name</label><input id="last-name" name="lastName" type="text" autoComplete="family-name" value={form.lastName} onChange={updateField} required /></div>
+            <FormField id="first-name" label="First name"><input id="first-name" name="firstName" type="text" autoComplete="given-name" value={form.firstName} onChange={updateField} required /></FormField>
+            <FormField id="last-name" label="Last name"><input id="last-name" name="lastName" type="text" autoComplete="family-name" value={form.lastName} onChange={updateField} required /></FormField>
           </div>
-          <div className="field-group"><label htmlFor="account-email">Email address</label><input id="account-email" name="email" type="email" autoComplete="email" placeholder="you@example.com" value={form.email} onChange={updateField} required /></div>
-          <div className="field-group"><label htmlFor="account-password">Password</label><input id="account-password" name="password" type="password" autoComplete="new-password" placeholder="Create a password" value={form.password} onChange={updateField} required /></div>
-          <div className="field-group"><label htmlFor="confirm-password">Confirm password</label><input id="confirm-password" name="confirmPassword" type="password" autoComplete="new-password" placeholder="Re-enter your password" value={form.confirmPassword} onChange={updateField} required /></div>
+          <FormField id="account-email" label="Email address"><input id="account-email" name="email" type="email" autoComplete="email" placeholder="you@example.com" value={form.email} onChange={updateField} required /></FormField>
+          <FormField id="account-password" label="Password"><input id="account-password" name="password" type="password" autoComplete="new-password" placeholder="Create a password" value={form.password} onChange={updateField} required /></FormField>
+          <FormField id="confirm-password" label="Confirm password"><input id="confirm-password" name="confirmPassword" type="password" autoComplete="new-password" placeholder="Re-enter your password" value={form.confirmPassword} onChange={updateField} required /></FormField>
           <button className="button" type="submit">Create account</button>
         </form>
 

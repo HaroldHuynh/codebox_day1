@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import FormField from "./components/FormField";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -21,10 +22,9 @@ export default function LoginForm() {
         <p className="subtitle">Enter your details to continue.</p>
 
         <form className="login-form" onSubmit={handleSubmit}>
-          <div className="field-group">
-            <label htmlFor="email">Email address</label>
+          <FormField id="email" label="Email address">
             <input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" value={email} onChange={(event) => setEmail(event.target.value)} required />
-          </div>
+          </FormField>
           <div className="field-group">
             <div className="field-header">
               <label htmlFor="password">Password</label>
