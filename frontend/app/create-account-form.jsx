@@ -8,14 +8,40 @@ const initialForm = { firstName: "", lastName: "", email: "", password: "", conf
 
 export default function CreateAccountForm() {
   const [form, setForm] = useState(initialForm);
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function updateField(event) {
     const { name, value } = event.target;
     setForm((currentForm) => ({ ...currentForm, [name]: value }));
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    setStatus({ type: "", message: "" });
+
+    if (form.password !== form.confirmPassword) {
+      setStatus({ type: "error", message: "Passwords do not match." });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const { confirmPassword, ...accountData } = form;
+      const response = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(accountData),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Unable to create your account.");
+      setStatus({ type: "success", message: "Account created. Check your email to verify it." });
+      setForm(initialForm);
+    } catch (error) {
+      setStatus({ type: "error", message: error.message });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -34,7 +60,10 @@ export default function CreateAccountForm() {
           <FormField id="account-email" label="Email address"><input id="account-email" name="email" type="email" autoComplete="email" placeholder="you@example.com" value={form.email} onChange={updateField} required /></FormField>
           <FormField id="account-password" label="Password"><input id="account-password" name="password" type="password" autoComplete="new-password" placeholder="Create a password" value={form.password} onChange={updateField} required /></FormField>
           <FormField id="confirm-password" label="Confirm password"><input id="confirm-password" name="confirmPassword" type="password" autoComplete="new-password" placeholder="Re-enter your password" value={form.confirmPassword} onChange={updateField} required /></FormField>
-          <button className="button" type="submit">Create account</button>
+          {status.message && <p className={`form-status ${status.type}`} role="status">{status.message}</p>}
+          <button className="button" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Creating account..." : "Create account"}
+          </button>
         </form>
 
         <p className="signup-prompt">Already have an account? <Link href="/login" className="text-link">Sign in</Link></p>

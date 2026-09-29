@@ -1,16 +1,42 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import FormField from "./components/FormField";
 
 export default function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
+    setStatus({ type: "", message: "" });
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const result = await response.json();
+
+      if (!response.ok) throw new Error(result.error || "Unable to sign in.");
+
+      const storage = remember ? localStorage : sessionStorage;
+      storage.setItem("goodies_access_token", result.access_token);
+      storage.setItem("goodies_refresh_token", result.refresh_token);
+      router.push("/");
+    } catch (error) {
+      setStatus({ type: "error", message: error.message });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -36,7 +62,10 @@ export default function LoginForm() {
             <input type="checkbox" name="remember" checked={remember} onChange={(event) => setRemember(event.target.checked)} />
             <span>Remember me</span>
           </label>
-          <button className="button" type="submit">Sign in</button>
+          {status.message && <p className={`form-status ${status.type}`} role="status">{status.message}</p>}
+          <button className="button" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Signing in..." : "Sign in"}
+          </button>
         </form>
 
         <p className="signup-prompt">

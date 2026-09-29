@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
+const authClient = require("../config/authClient");
 
-function authenticateToken(req, res, next) {
+async function authenticateToken(req, res, next) {
   const authorization = req.get("authorization");
   const match = authorization && authorization.match(/^Bearer\s+(.+)$/i);
 
@@ -8,14 +8,14 @@ function authenticateToken(req, res, next) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  try {
-    req.auth = jwt.verify(match[1], process.env.JWT_SECRET, {
-      algorithms: ["HS256"],
-    });
-    return next();
-  } catch (error) {
+  const { data, error } = await authClient.auth.getUser(match[1]);
+
+  if (error || !data.user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
+
+  req.auth = data.user;
+  return next();
 }
 
 module.exports = authenticateToken;

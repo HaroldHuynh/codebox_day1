@@ -10,10 +10,36 @@ const {
 const router = express.Router();
 
 router.post("/", async (req, res) => {
+  const body = req.body ?? {};
+  // Keep the public API camelCase while explicitly mapping to the database's
+  // snake_case columns in createUser(). Accept snake_case too for API clients.
+  const firstName = body.firstName ?? body.first_name;
+  const lastName = body.lastName ?? body.last_name;
+  const { email, password } = body;
+
+  if (
+    typeof firstName !== "string" || typeof lastName !== "string" ||
+    typeof email !== "string" || typeof password !== "string" ||
+    !firstName.trim() ||
+    !lastName.trim() || !email.trim() || !password
+  ) {
+    return res.status(400).json({ error: "firstName, lastName, email, and password are required" });
+  }
+
+  if (password.length < 8) {
+    return res.status(400).json({ error: "Password must be at least 8 characters" });
+  }
+
   try {
-    const newUser = await createUser(req.body);
+    const newUser = await createUser({
+      firstName: firstName.trim(), lastName: lastName.trim(),
+      email: email.trim().toLowerCase(), password,
+    });
     return res.status(201).json(newUser);
   } catch (error) {
+    if (error.code === "user_already_exists" || error.code === "email_exists") {
+      return res.status(409).json({ error: "An account with that email already exists" });
+    }
     return res.status(500).json({ error: error.message });
   }
 });
