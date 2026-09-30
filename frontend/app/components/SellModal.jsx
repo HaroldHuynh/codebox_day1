@@ -2,10 +2,17 @@
 
 import { useState } from "react";
 
-const initialForm = { itemName: "", itemDescription: "", price: "", itemCondition: "", location: "" };
+const emptyForm = { itemName: "", itemDescription: "", price: "", itemCondition: "", location: "" };
 
-export default function SellModal({ onClose }) {
-  const [form, setForm] = useState(initialForm);
+export default function SellModal({ onClose, onItemPosted, item }) {
+  const isEditing = Boolean(item);
+  const [form, setForm] = useState(item ? {
+    itemName: item.item_name,
+    itemDescription: item.item_description,
+    price: item.price,
+    itemCondition: item.item_condition,
+    location: item.location,
+  } : emptyForm);
   const [status, setStatus] = useState({ type: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -20,15 +27,15 @@ export default function SellModal({ onClose }) {
     setIsSubmitting(true);
     const accessToken = localStorage.getItem("goodies_access_token") || sessionStorage.getItem("goodies_access_token");
     try {
-      const response = await fetch("/api/items", {
-        method: "POST",
+      const response = await fetch(isEditing ? `/api/items/${item.id}` : "/api/items", {
+        method: isEditing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({ ...form, price: Number(form.price) }),
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Unable to post item.");
-      setStatus({ type: "success", message: "Item posted successfully." });
-      setForm(initialForm);
+      onItemPosted(result);
+      onClose();
     } catch (error) {
       setStatus({ type: "error", message: error.message });
     } finally {
@@ -40,7 +47,7 @@ export default function SellModal({ onClose }) {
     <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="sell-modal" role="dialog" aria-modal="true" aria-labelledby="sell-title">
         <div className="modal-heading">
-          <div><p className="eyebrow">Create a listing</p><h2 id="sell-title">Sell an item</h2></div>
+          <div><p className="eyebrow">{isEditing ? "Update your listing" : "Create a listing"}</p><h2 id="sell-title">{isEditing ? "Edit item" : "Sell an item"}</h2></div>
           <button className="modal-close" type="button" onClick={onClose} aria-label="Close sell form">×</button>
         </div>
         <form className="sell-form" onSubmit={handleSubmit}>

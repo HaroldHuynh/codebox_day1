@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import SellModal from "./SellModal";
 
-export default function Navbar() {
+export default function Navbar({ onItemPosted }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -50,7 +50,7 @@ export default function Navbar() {
     localStorage.removeItem("goodies_refresh_token");
     sessionStorage.removeItem("goodies_access_token");
     sessionStorage.removeItem("goodies_refresh_token");
-    setIsAuthenticated(false);
+    window.location.reload();
   }
 
   function handleSellClick() {
@@ -82,7 +82,12 @@ export default function Navbar() {
           Sell
         </button>
       </div>
-      {isSellOpen && <SellModal onClose={() => setIsSellOpen(false)} />}
+      {isSellOpen && (
+        <SellModal
+          onClose={() => setIsSellOpen(false)}
+          onItemPosted={onItemPosted}
+        />
+      )}
     </nav>
   );
 }
