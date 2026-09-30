@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import SellModal from "./SellModal";
 
 export default function Navbar() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isSellOpen, setIsSellOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,7 +58,9 @@ export default function Navbar() {
 
     if (!isAuthenticated) {
       router.push("/login");
+      return;
     }
+    setIsSellOpen(true);
   }
 
   return (
@@ -78,6 +82,7 @@ export default function Navbar() {
           Sell
         </button>
       </div>
+      {isSellOpen && <SellModal onClose={() => setIsSellOpen(false)} />}
     </nav>
   );
 }

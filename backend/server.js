@@ -4,6 +4,7 @@ const express = require("express");
 const authenticateToken = require("./middleware/auth");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
+const itemsRouter = require("./routes/items");
 const supabase = require("./config/database");
 
 if (!process.env.JWT_SECRET) {
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", usersRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/items", itemsRouter);
 
 app.get("/api/me", authenticateToken, async (req, res) => {
   const { data: profile, error: profileError } = await supabase
