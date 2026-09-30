@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const emptyForm = { itemName: "", itemDescription: "", price: "", itemCondition: "", location: "" };
 
-export default function SellModal({ onClose, onItemPosted, item }) {
+export default function SellModal({ onClose, onItemPosted, onItemDeleted, item }) {
   const isEditing = Boolean(item);
   const [form, setForm] = useState(item ? {
     itemName: item.item_name,
@@ -43,6 +43,29 @@ export default function SellModal({ onClose, onItemPosted, item }) {
     }
   }
 
+  async function handleDelete() {
+    if (!window.confirm("Delete this posting?")) return;
+    setStatus({ type: "", message: "" });
+    setIsSubmitting(true);
+    const accessToken = localStorage.getItem("goodies_access_token") || sessionStorage.getItem("goodies_access_token");
+    try {
+      const response = await fetch(`/api/items/${item.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}));
+        throw new Error(result.error || "Unable to delete item.");
+      }
+      onItemDeleted(item.id);
+      onClose();
+    } catch (error) {
+      setStatus({ type: "error", message: error.message });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <section className="sell-modal" role="dialog" aria-modal="true" aria-labelledby="sell-title">
@@ -60,6 +83,7 @@ export default function SellModal({ onClose, onItemPosted, item }) {
           <label>Location<input name="location" value={form.location} onChange={updateField} required /></label>
           {status.message && <p className={`form-status ${status.type}`} role="status">{status.message}</p>}
           <button className="button" type="submit" disabled={isSubmitting}>{isSubmitting ? "Posting..." : "Post"}</button>
+          {isEditing && <button className="button button-danger" type="button" onClick={handleDelete} disabled={isSubmitting}>Delete posting</button>}
         </form>
       </section>
     </div>

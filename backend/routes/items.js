@@ -72,7 +72,6 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     .from("items")
     .delete()
     .eq("id", req.params.id)
-    .neq("seller_id", req.auth.id)
     .select("id")
     .maybeSingle();
 

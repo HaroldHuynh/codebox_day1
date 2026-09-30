@@ -315,6 +315,16 @@ input[type="password"]:focus {
   padding: 10px 14px;
   font-size: 0.875rem;
 }
+.button-danger {
+  color: #991b1b;
+  background: #fff;
+  border-color: #fecaca;
+}
+.button-danger:hover {
+  color: #fff;
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
 .listings-section {
   padding: 88px 0 80px;
 }
